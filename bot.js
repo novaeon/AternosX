@@ -13,7 +13,7 @@ function sendWebhookMessage(message) {
   //});
 }
 
-const centerPosition = new Vec3(-14488, 90, 13817); // Center point (for example, let's think of it as (x=0, y=4, z=0))
+const centerPosition = new Vec3(-146, 59, 38); // Center point (for example, let's think of it as (x=0, y=4, z=0))
 const squareSize = 3; // Square size (side length)
 const moveInterval = 5000; // Waiting time between each corner movement (in milliseconds)
 
