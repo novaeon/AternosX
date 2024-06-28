@@ -58,18 +58,6 @@ function moveInSquare(bot) {
   cornerIndex = (cornerIndex + 1) % corners.length;
 }
 
-function findBed() {
-  var cursor = Vec3();
-  for(cursor.x = bot.entity.position.x - 4; cursor.x < bot.entity.position.x + 4; cursor.x++) {
-    for(cursor.y = bot.entity.position.y - 4; cursor.y < bot.entity.position.y + 4; cursor.y++) {
-      for(cursor.z = bot.entity.position.z - 4; cursor.z < bot.entity.position.z + 4; cursor.z++) {
-        var block = bot.blockAt(cursor);
-        if (block.type === 26) return block;
-      }
-    }
-  }
-}
-
 function checkCorner(bot, target) {
   const pos = bot.entity.position.floored();
   if (pos.equals(target)) {
