@@ -41,7 +41,7 @@ function moveInSquare(bot) {
 }
 
 function findBed() {
-  var cursor = mineflayer.vec3();
+  var cursor = Vec3();
   for(cursor.x = bot.entity.position.x - 4; cursor.x < bot.entity.position.x + 4; cursor.x++) {
     for(cursor.y = bot.entity.position.y - 4; cursor.y < bot.entity.position.y + 4; cursor.y++) {
       for(cursor.z = bot.entity.position.z - 4; cursor.z < bot.entity.position.z + 4; cursor.z++) {
