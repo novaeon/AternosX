@@ -110,7 +110,7 @@ function createBot() {
 
   bot.on('entitySleep', (entity) => {
     sleepingPlayers = sleepingPlayers + 1; // Ensure sleepingPlayers is declared elsewhere
-    let playerCount = bot.players.size;
+    let playerCount = Object.keys(bot.players).length;
     bot.chat(`Good night, ${entity.username}. ${sleepingPlayers} / ${playerCount} asleep.`);
     
     if (sleepingPlayers === playerCount - 1) {
