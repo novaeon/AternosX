@@ -1,21 +1,40 @@
 const mineflayer = require('mineflayer');
 const { pathfinder, Movements, goals } = require('mineflayer-pathfinder');
 const { Vec3 } = require('vec3');
-const axios = require('axios');
 
-// const WEBHOOK_URL = ' '; //Add your Discord Webhook URL here
-
-function sendWebhookMessage(message) {
-  //axios.post(WEBHOOK_URL, {
-  //  content: message
-  //}).catch(error => {
-  //  console.error('Discord Webhook hatası:', error);
-  //});
-}
-
-const centerPosition = new Vec3(-14488, 90, 13817); // Center point (for example, let's think of it as (x=0, y=4, z=0))
+const centerPosition = new Vec3(-146, 59, 38); // Center point (for example, let's think of it as (x=0, y=4, z=0))
 const squareSize = 3; // Square size (side length)
 const moveInterval = 5000; // Waiting time between each corner movement (in milliseconds)
+
+const bedStand = new Vec3(-147, 59, 38);
+const bed_coord = new Vec3(-146, 59, 38);
+var sleepingPlayers = 0;
+
+const sleepmessages = [
+  "Be advised, I am eepy.",
+  "Stand by for honk-shoo.",
+  "All units, my tummy hurts. Requesting a blankie and a cup of hot choccy.",
+  "Nighty night, sleep tight, don't let the bed bugs bite.",
+  "Eepy time.",
+  "Zzz... Zzz... Zzz...",
+  "yawn... I'm sleepy...",
+];
+
+const randomMessages = [
+  "I've got a tip for you...",
+  "FUCK! I stubbed my toe.",
+  "The weather is nice today.",
+  "Beep boop.",
+  "Remember to drink water.",
+  "The mitochondria is the powerhouse of the cell.",
+  "Have you heard of the tragedy of Darth Plagueis the Wise?",
+  "Creeper, aw",
+  "No one expects the Spanish Inquisition!",
+  "Hello, world!",
+  "My name is poopbot.",
+  "the quick brown fox jumps over the lazy dog",
+  "you wouldn't download a car"
+];
 
 let cornerIndex = 0;
 const corners = [
@@ -67,54 +86,82 @@ function createBot() {
     username: 'poopbot',      // Bot's username
     version: '1.15.2'       // Minecraft server version (Up to 1.20 other versions work with "Via Version")
   });
-
   
   bot.loadPlugin(pathfinder);
 
   bot.on('login', () => {
     console.log('Bot connected to the server');
-    sendWebhookMessage('Bot connected to the server');
   });
 
   bot.on('spawn', () => {
     console.log('Bot has spawned'); // Discord WebHook : Bot has spawned
-    sendWebhookMessage('Bot has spawned'); // Discord WebHook : Bot has spawned
     moveInSquare(bot);
     setInterval(() => moveInSquare(bot), moveInterval); 
+
+    setInterval(() => {
+      if (Math.floor(Math.random() * 100) === 1) { // 1/100 chance
+        const message = randomMessages[Math.floor(Math.random() * randomMessages.length)];
+        bot.chat(message);
+      }
+    }, 2500); // Check every 5 seconds
   });
 
   bot.on('chat', (username, message) => {
     if (username === bot.username) return;
     console.log(`${username}: ${message}`);
-    // sendWebhookMessage(`${username} said: ${message}`);
-
     if (message === 'straight up jorkin it') { // Message (You can change this code)
-      setTimeout(() => {
+      setTimeout(() => {  
         bot.chat("and by it... let's just say... my peanits"); // Feedback (You can change this code)
       }, 4000); // Sleep for 5 seconds (5000 milliseconds)
+    }
+    if (message === 'poopbot sleep') {
+      bedBlock = bot.blockAt(bed_coord);
+      bot.chat(sleepmessages[Math.floor(Math.random() * sleepmessages.length)]);
+      bot.pathfinder.setGoal(new goals.GoalBlock(bedStand.x, bedStand.y, bedStand.z));
+      setTimeout(() => {
+        bot.sleep(bedBlock);
+      }, 1000);
     }
   });
 
   bot.on('error', err => {
     console.error(`Bot error: ${err}`);
-    sendWebhookMessage(`Bot error: ${err}`);
     setTimeout(createBot, 5000); // Reconnect after 5 seconds
   });
 
   bot.on('end', () => {
     console.log('Bot disconnected from the server');
-    sendWebhookMessage('Bot disconnected from the server');
     setTimeout(createBot, 5000); // Reconnect after 5 seconds
   });
 
   bot.on('kicked', (reason, loggedIn) => {
     console.log(`Bot was kicked from the server: ${reason}`); // Terminal : Bot was kicked from the server
-    sendWebhookMessage(`Bot was kicked from the server: ${reason}`); // Discord WebHook : Bot was kicked from the server
   });
 
   bot.on('death', () => {
     console.log('Bot died'); // Discord WebHook : The bot is dead
-    sendWebhookMessage('Bot died'); // Discord WebHook : The bot is dead
+  });
+
+  bot.on('entitySleep', (entity) => {
+    if (entity === bot.entity) return;
+    sleepingPlayers++;
+    playerCount = Object.keys(bot.players).length;
+    bot.chat(`Good night, ${entity.username}. (${sleepingPlayers}/${playerCount-1})`);
+    if (sleepingPlayers === playerCount-1) {
+      bedBlock = bot.blockAt(bed_coord);
+      bot.chat(sleepmessages[Math.floor(Math.random() * sleepmessages.length)]);
+      bot.pathfinder.setGoal(new goals.GoalBlock(bedStand.x, bedStand.y, bedStand.z));
+      setTimeout(() => {
+        bot.sleep(bedBlock);
+      }, 1000);
+    }
+  });
+
+  bot.on('entityWake', (entity) => {
+    if (entity === bot.entity) return;
+    playerCount = Object.keys(bot.players).length;
+    sleepingPlayers--;
+    // bot.chat(`Good morning, ${entity.username}. (${sleepingPlayers}/${playerCount-1})`);
   });
 }
 
