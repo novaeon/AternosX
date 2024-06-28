@@ -17,6 +17,7 @@ const centerPosition = new Vec3(-146, 59, 38); // Center point (for example, let
 const squareSize = 3; // Square size (side length)
 const moveInterval = 5000; // Waiting time between each corner movement (in milliseconds)
 
+let sleepingPlayers = 0;
 let cornerIndex = 0;
 const corners = [
   centerPosition.offset(squareSize, 0, squareSize), // upper right corner
@@ -37,6 +38,18 @@ function moveInSquare(bot) {
   console.log(`Bot ${bot.username} is moving towards the target: ${target}`);  // This code sends the character to Discord wherever it goes (delete the 2 slashes at the beginning of the code to unlock the code).
 
   cornerIndex = (cornerIndex + 1) % corners.length;
+}
+
+function findBed() {
+  var cursor = mineflayer.vec3();
+  for(cursor.x = bot.entity.position.x - 4; cursor.x < bot.entity.position.x + 4; cursor.x++) {
+    for(cursor.y = bot.entity.position.y - 4; cursor.y < bot.entity.position.y + 4; cursor.y++) {
+      for(cursor.z = bot.entity.position.z - 4; cursor.z < bot.entity.position.z + 4; cursor.z++) {
+        var block = bot.blockAt(cursor);
+        if (block.type === 26) return block;
+      }
+    }
+  }
 }
 
 function checkCorner(bot, target) {
@@ -94,6 +107,24 @@ function createBot() {
       }, 4000); // Sleep for 5 seconds (5000 milliseconds)
     }
   });
+
+  bot.on('entitySleep', (entity) => {
+    sleepingPlayers = sleepingPlayers + 1; // Ensure sleepingPlayers is declared elsewhere
+    let playerCount = bot.players.size;
+    bot.chat(`Good night, ${entity.username}. ${sleepingPlayers} / ${playerCount} asleep.`);
+    
+    if (sleepingPlayers === playerCount - 1) {
+      bot.chat('Going to bed!');
+      var bedBlock = findBed();
+      if (bedBlock) {
+        bot.chat("counting sheep");
+        bot.sleep(bedBlock);
+      } else {
+        bot.chat("no nearby bed");
+      }
+    }
+  });
+
 
   bot.on('error', err => {
     console.error(`Bot error: ${err}`);
