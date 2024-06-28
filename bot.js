@@ -58,6 +58,18 @@ function moveInSquare(bot) {
   cornerIndex = (cornerIndex + 1) % corners.length;
 }
 
+function findBed() {
+  var cursor = Vec3();
+  for(cursor.x = bot.entity.position.x - 4; cursor.x < bot.entity.position.x + 4; cursor.x++) {
+    for(cursor.y = bot.entity.position.y - 4; cursor.y < bot.entity.position.y + 4; cursor.y++) {
+      for(cursor.z = bot.entity.position.z - 4; cursor.z < bot.entity.position.z + 4; cursor.z++) {
+        var block = bot.blockAt(cursor);
+        if (block.type === 26) return block;
+      }
+    }
+  }
+}
+
 function checkCorner(bot, target) {
   const pos = bot.entity.position.floored();
   if (pos.equals(target)) {
@@ -123,6 +135,24 @@ function createBot() {
       }, 1000);
     }
   });
+
+  bot.on('entitySleep', (entity) => {
+    sleepingPlayers = sleepingPlayers + 1; // Ensure sleepingPlayers is declared elsewhere
+    let playerCount = Object.keys(bot.players).length;
+    bot.chat(`Good night, ${entity.username}. ${sleepingPlayers} / ${playerCount} asleep.`);
+    
+    if (sleepingPlayers === playerCount - 1) {
+      bot.chat('Going to bed!');
+      var bedBlock = findBed();
+      if (bedBlock) {
+        bot.chat("counting sheep");
+        bot.sleep(bedBlock);
+      } else {
+        bot.chat("no nearby bed");
+      }
+    }
+  });
+
 
   bot.on('error', err => {
     console.error(`Bot error: ${err}`);
