@@ -6,36 +6,6 @@ const centerPosition = new Vec3(-146, 59, 38); // Center point (for example, let
 const squareSize = 3; // Square size (side length)
 const moveInterval = 5000; // Waiting time between each corner movement (in milliseconds)
 
-const bedStand = new Vec3(-147, 59, 38);
-const bed_coord = new Vec3(-146, 59, 38);
-var sleepingPlayers = 0;
-
-const sleepmessages = [
-  "Be advised, I am eepy.",
-  "Stand by for honk-shoo.",
-  "All units, my tummy hurts. Requesting a blankie and a cup of hot choccy.",
-  "Nighty night, sleep tight, don't let the bed bugs bite.",
-  "Eepy time.",
-  "Zzz... Zzz... Zzz...",
-  "yawn... I'm sleepy...",
-];
-
-const randomMessages = [
-  "I've got a tip for you...",
-  "FUCK! I stubbed my toe.",
-  "The weather is nice today.",
-  "Beep boop.",
-  "Remember to drink water.",
-  "The mitochondria is the powerhouse of the cell.",
-  "Have you heard of the tragedy of Darth Plagueis the Wise?",
-  "Creeper, aw",
-  "No one expects the Spanish Inquisition!",
-  "Hello, world!",
-  "My name is poopbot.",
-  "the quick brown fox jumps over the lazy dog",
-  "you wouldn't download a car"
-];
-
 let cornerIndex = 0;
 const corners = [
   centerPosition.offset(squareSize, 0, squareSize), // upper right corner
@@ -97,50 +67,16 @@ function createBot() {
     console.log('Bot has spawned'); // Discord WebHook : Bot has spawned
     moveInSquare(bot);
     setInterval(() => moveInSquare(bot), moveInterval); 
-
-    setInterval(() => {
-      if (Math.floor(Math.random() * 100) === 1) { // 1/100 chance
-        const message = randomMessages[Math.floor(Math.random() * randomMessages.length)];
-        bot.chat(message);
-      }
-    }, 2500); // Check every 5 seconds
   });
 
   bot.on('chat', (username, message) => {
     if (username === bot.username) return;
-    console.log(`${username}: ${message}`);
     if (message === 'straight up jorkin it') { // Message (You can change this code)
       setTimeout(() => {  
         bot.chat("and by it... let's just say... my peanits"); // Feedback (You can change this code)
       }, 4000); // Sleep for 5 seconds (5000 milliseconds)
     }
-    if (message === 'poopbot sleep') {
-      bedBlock = bot.blockAt(bed_coord);
-      bot.chat(sleepmessages[Math.floor(Math.random() * sleepmessages.length)]);
-      bot.pathfinder.setGoal(new goals.GoalBlock(bedStand.x, bedStand.y, bedStand.z));
-      setTimeout(() => {
-        bot.sleep(bedBlock);
-      }, 1000);
-    }
   });
-
-  bot.on('entitySleep', (entity) => {
-    sleepingPlayers = sleepingPlayers + 1; // Ensure sleepingPlayers is declared elsewhere
-    let playerCount = Object.keys(bot.players).length;
-    bot.chat(`Good night, ${entity.username}. ${sleepingPlayers} / ${playerCount} asleep.`);
-    
-    if (sleepingPlayers === playerCount - 1) {
-      bot.chat('Going to bed!');
-      var bedBlock = findBed();
-      if (bedBlock) {
-        bot.chat("counting sheep");
-        bot.sleep(bedBlock);
-      } else {
-        bot.chat("no nearby bed");
-      }
-    }
-  });
-
 
   bot.on('error', err => {
     console.error(`Bot error: ${err}`);
@@ -158,28 +94,6 @@ function createBot() {
 
   bot.on('death', () => {
     console.log('Bot died'); // Discord WebHook : The bot is dead
-  });
-
-  bot.on('entitySleep', (entity) => {
-    if (entity === bot.entity) return;
-    sleepingPlayers++;
-    playerCount = Object.keys(bot.players).length;
-    bot.chat(`Good night, ${entity.username}. (${sleepingPlayers}/${playerCount-1})`);
-    if (sleepingPlayers === playerCount-1) {
-      bedBlock = bot.blockAt(bed_coord);
-      bot.chat(sleepmessages[Math.floor(Math.random() * sleepmessages.length)]);
-      bot.pathfinder.setGoal(new goals.GoalBlock(bedStand.x, bedStand.y, bedStand.z));
-      setTimeout(() => {
-        bot.sleep(bedBlock);
-      }, 1000);
-    }
-  });
-
-  bot.on('entityWake', (entity) => {
-    if (entity === bot.entity) return;
-    playerCount = Object.keys(bot.players).length;
-    sleepingPlayers--;
-    // bot.chat(`Good morning, ${entity.username}. (${sleepingPlayers}/${playerCount-1})`);
   });
 }
 
