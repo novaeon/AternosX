@@ -54,7 +54,7 @@ function createBot() {
     host: 'poopgc.aternos.me',    // Minecraft server IP address
     port: 35320,          // Port of the Minecraft server (default: 25565)
     username: 'poopbot',      // Bot's username
-    version: '1.15.2'       // Minecraft server version (Up to 1.20 other versions work with "Via Version")
+    version: '1.21'       // Minecraft server version (Up to 1.20 other versions work with "Via Version")
   });
   
   bot.loadPlugin(pathfinder);
